@@ -17,11 +17,6 @@ namespace NotesApplication.Controllers
         {
             _noteService = new NoteService(context);
         }
-          /*[HttpGet]
-          public IActionResult GetNotes()
-          {
-              return Ok(_noteService.GetAll().ToList());
-          }*/
 
         [HttpGet("{id}")]
         public IActionResult GetNote(int id)
@@ -33,6 +28,7 @@ namespace NotesApplication.Controllers
             }
             return Ok(note);
         }
+
         [HttpGet]
         public IActionResult GetNotes([FromQuery] string filter)
         {
@@ -43,63 +39,39 @@ namespace NotesApplication.Controllers
             return Ok(_noteService.FilterBy(filter).ToList());
         }
 
-        /*[HttpPost]
-        public IActionResult CreateNote(Note note)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            _noteService.Create(note);
-            return CreatedAtAction("GetNote", new { id = note.Id }, note);
-            
-        }*/
         [HttpPost]
         public IActionResult CreateNote(AddNoteDTO addNoteDTO)
-        {
-            var note = new Note
-            {
-                Text = addNoteDTO.Text,
-                color = Enum.Parse<Color>(addNoteDTO.Color, true),
-                UserId = 1
-            };
-            _noteService.Create(note);
-            return CreatedAtAction("GetNote", new { id = note.Id }, note);
+        { 
+            _noteService.Create(addNoteDTO);
+            return CreatedAtAction("GetNote", new { id = addNoteDTO }, addNoteDTO);
         }
 
         [HttpPut("{id}")]
         public IActionResult UpdateNote(int id, AddNoteDTO addNoteDTO)
         {
-            var note = _noteService.GetNote(id);
-            if(note != null)
-            {
-                note.Text = addNoteDTO.Text;
-                note.color = Enum.Parse<Color>(addNoteDTO.Color, true);
-            }
             try
             {
-                _noteService.Update(note);
+                _noteService.Update(id, addNoteDTO);
             }
-            catch
+            catch (ArgumentException ex)
             {
-                return BadRequest();
+                return NotFound(ex.Message);
             }
-
-            return Ok(note);
-
+            return Ok(addNoteDTO);
         }
+
         [HttpDelete("{id}")]
         public IActionResult DeleteNote(int id)
         {
-            var note = _noteService.GetNote(id);
-            if(note == null)
+            try
             {
-                return NotFound();
+                _noteService.DeleteNote(id);
             }
-            _noteService.DeleteNote(note);
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
             return NoContent();
         }
-
     }
 }

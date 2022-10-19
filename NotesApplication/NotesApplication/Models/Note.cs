@@ -11,9 +11,7 @@ namespace NotesApplication.Models
         public User User { get; set; }
         [Required]
         public string Text { get; set; }
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-      //  [System.ComponentModel.DataAnnotations.Schema.Column(TypeName = "text(24)")]
-        public Color color { get; set; }
+        public Color Color { get; set; }
 
        
     }
