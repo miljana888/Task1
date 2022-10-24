@@ -11,6 +11,7 @@ namespace NotesApplication.Models
         public User User { get; set; }
         [Required]
         public string Text { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public Color Color { get; set; }
 
        

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NotesApplication.Models;
+using NotesApplication.Models.DTO;
 using NotesApplication.Service;
 
 namespace NotesApplication.Controllers
@@ -28,15 +29,15 @@ namespace NotesApplication.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateUser(User user)
+        public IActionResult CreateUser(AddUserDto addUserDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            _userService.Create(user);
+            var user = _userService.Create(addUserDto);
 
-            return CreatedAtAction("GetUser", new { Id = user.Id }, user);
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
 
         [HttpGet]
@@ -46,7 +47,7 @@ namespace NotesApplication.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult PutUser(int id, User user)
+        public IActionResult PutUser(int id, UpdateUserDto updateUserDto)
         {
             if (!ModelState.IsValid)
             {
@@ -54,13 +55,13 @@ namespace NotesApplication.Controllers
             }
             try
             {
-                _userService.Update(id, user);
+                _userService.Update(id, updateUserDto);
             }
             catch (ArgumentException ex)
             {
                 return NotFound(ex.Message);
             }
-            return Ok(user);
+            return Ok(updateUserDto);
         }
 
         [HttpDelete("{id}")]

@@ -32,32 +32,29 @@ namespace NotesApplication.Controllers
         [HttpGet]
         public IActionResult GetNotes([FromQuery] string filter)
         {
-            if(filter == null)
-            {
-                return BadRequest();
-            }
-            return Ok(_noteService.FilterBy(filter).ToList());
+            var notes = _noteService.FilterBy(filter).ToList();
+            return Ok(notes);
         }
 
         [HttpPost]
         public IActionResult CreateNote(AddNoteDTO addNoteDTO)
         { 
-            _noteService.Create(addNoteDTO);
-            return CreatedAtAction("GetNote", new { id = addNoteDTO }, addNoteDTO);
+            var note = _noteService.Create(addNoteDTO);
+            return CreatedAtAction(nameof(GetNote), new { id = note.Id }, note);
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateNote(int id, AddNoteDTO addNoteDTO)
+        public IActionResult UpdateNote(int id, UpdateNoteDto updateNoteDto)
         {
             try
             {
-                _noteService.Update(id, addNoteDTO);
+                _noteService.Update(id, updateNoteDto);
             }
             catch (ArgumentException ex)
             {
                 return NotFound(ex.Message);
             }
-            return Ok(addNoteDTO);
+            return Ok(updateNoteDto);
         }
 
         [HttpDelete("{id}")]

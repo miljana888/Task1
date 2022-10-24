@@ -26,33 +26,44 @@ namespace NotesApplication.Service
 
         public IQueryable<Note>FilterBy(string filter)
         {
+            if (filter == null)
+            {
+                return _context.Notes;
+            }
             return _context.Notes.Where(n => n.Text.ToLower().Contains(filter.ToLower()));
         }
 
-        public void Create(AddNoteDTO addNoteDTO)
+        public Note Create(AddNoteDTO addNoteDTO)
         {
             var note = new Note
             {
                 Text = addNoteDTO.Text,
                 Color = Enum.Parse<Color>(addNoteDTO.Color, true),
-                UserId = 1
+                UserId = addNoteDTO.UserId
             };
             _context.Notes.Add(note);
             _context.SaveChanges();
+
+            return note;
         }
 
-        public void Update(int id, AddNoteDTO addNoteDTO)
+        public Note Update(int id, UpdateNoteDto updateNoteDto)
         {
             var note = GetNote(id);
             if (note != null)
             {
-                note.Text = addNoteDTO.Text;
-                note.Color = Enum.Parse<Color>(addNoteDTO.Color, true);
+                note.Text = updateNoteDto.Text;
+                note.Color = Enum.Parse<Color>(updateNoteDto.Color, true);
+                note.Id = updateNoteDto.Id;
             }
+            else
+            {
             throw new ArgumentException(message: "There is no note with that id");
-
+            }
             _context.Entry(note).State = EntityState.Modified;
             _context.SaveChanges();
+
+            return note;
         }
 
         public void DeleteNote(int id)

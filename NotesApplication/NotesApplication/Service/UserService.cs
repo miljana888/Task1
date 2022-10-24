@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NotesApplication.Models;
+using NotesApplication.Models.DTO;
 
 namespace NotesApplication.Service
 {
@@ -12,10 +13,18 @@ namespace NotesApplication.Service
             this._context = context;
         }
 
-        public void Create (User user)
+        public User Create (AddUserDto addUserDto)
         {
+            var user = new User()
+            {
+                FirstName = addUserDto.FirstName,
+                LastName = addUserDto.LastName,
+                Email = addUserDto.Email
+            };
             _context.Users.Add(user);
             _context.SaveChanges();
+
+            return user;
         }
 
         public User GetUser(int id)
@@ -28,15 +37,24 @@ namespace NotesApplication.Service
             return _context.Users;
         }
 
-        public void Update(int id, User user)
+        public User Update(int id, UpdateUserDto updateUserDto)
         {
-
-            if (id != user.Id)
+            var user = GetUser(id);
+            if (user != null)
+            {
+                user.FirstName = updateUserDto.FirstName;
+                user.LastName = updateUserDto.LastName;
+                user.Email = updateUserDto.Email;
+                user.Id = updateUserDto.Id;    
+            }
+            else
             {
                 throw new ArgumentException(message: "There is no user with that id");
             }
             _context.Entry(user).State = EntityState.Modified;
             _context.SaveChanges();
+
+            return user;
         }
 
         public void DeleteUser(int id)
